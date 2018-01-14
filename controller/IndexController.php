@@ -3,19 +3,19 @@
 /**
  * Class IndexController
  */
-class IndexController extends ControllerInterface {
+class IndexController extends ControllerInterface
+{
+    public function initTemplate()
+    {
+        $this->setTemplate(
+            'index',
+            array(
+                'title' => 'Home',
+                )
+        );
+    }
 
-  public function InitTemplate() {
-    $this->setTemplate('index', array(
-      'title' => '首页',
-      'mymenu' => array(
-
-      )
-    ));
-  }
-
-  public function InitOutput() {
-
-  }
-
+    public function initOutput()
+    {
+    }
 }

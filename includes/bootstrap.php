@@ -1,7 +1,5 @@
 <?php
 
-namespace bootstrap;
-
 class Config
 {
     public static $config;
@@ -52,6 +50,7 @@ abstract class ControllerInterface
     public function __construct($path = '')
     {
         $db_config = Config::get('db');
+        $site_config = Config::get('site_default');
 
         $this->db = new DB(
             $db_config['host'],
@@ -59,7 +58,18 @@ abstract class ControllerInterface
             $db_config['pass'],
             $db_config['name']
         );
-        $this->setTemplate($path);
+        
+        if ($this->db->connect_error) {
+            die('Connect Error (' . $mysqli->connect_errno . ') '
+                    . $mysqli->connect_error);
+        }
+
+        $this->setTemplate($path, $site_config);
+    }
+
+    public function __destruct()
+    {
+        $this->db->close();
     }
 
     public function setTemplate($template, $args = array())
@@ -99,14 +109,15 @@ abstract class ControllerInterface
      */
     public function display()
     {
-        $this->InitTemplate();
-        $this->InitOutput();
-
-        if ($args = $this->getArgs()) {
-            extract($this->getArgs());
+        $this->initTemplate();
+        $this->initOutput();
+        
+        $html = file_get_contents($this->getTemplate());
+        foreach ($this->getArgs() as $key => $val) {
+            $html=str_replace('{{ $'.$key.' }}', $val, $html);
         }
 
-        include $this->getTemplate();
+        echo $html;
     }
 }
 
@@ -143,7 +154,7 @@ class Client
             }
             include $controller_file;
             $this->setController(new $contoller($path));
-            return $this->getController()->Display();
+            return $this->getController()->display();
         } catch (Exception $e) {
             // 返回异常信息.
             return $e->getMessage();
@@ -156,6 +167,6 @@ class Client
     public function display()
     {
         $path = isset($_GET['action']) ? $_GET['action'] : '';
-        print $this->RouterDisplay($path);
+        print $this->routerDisplay($path);
     }
 }

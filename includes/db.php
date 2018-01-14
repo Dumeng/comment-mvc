@@ -1,5 +1,4 @@
 <?php
-namespace bootstrap;
 
 class DB extends mysqli
 {
