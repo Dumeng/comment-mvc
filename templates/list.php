@@ -1,1 +1,1 @@
-<?php print $title; ?>
+<?php print $title;
